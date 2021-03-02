@@ -14,7 +14,7 @@ pipeline {
         stage('checkout') {
             steps {
                 script {
-                    scmVars = checkout scmVars
+                    scmVars = checkout scm
                     echo scmVars.GIT_BRANCH
                 }
             }
@@ -66,6 +66,15 @@ pipeline {
             }
         }
 
+        stage('Docker build') {
+            steps {
+                script {
+                    if (scmVars.GIT_BRANCH == "origin/dev") {
+                        bat 'docker build -t nimit07/nagp-devops-try-dev --no-cache -f Dockerfile .'
+                    }
+                }
+            }
+        }
     }
     post {
         always {
