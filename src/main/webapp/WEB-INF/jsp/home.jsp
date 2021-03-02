@@ -33,7 +33,7 @@
 		<div class="page-dashboard page-dashboard-custom">
 			<div class="container"
 				style="background-image:url(${pageContext.request.contextPath}/resources/images/bg1.png);">
-				<h1>DevOps Sample Application</h1>
+				<h1>DevOps Sample PROD Application</h1>
 			</div>
 		</div>
 	</header>
