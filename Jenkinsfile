@@ -38,7 +38,7 @@ pipeline {
         stage('Sonar') {
             steps {
                 withSonarQubeEnv('SonarQube 8.4') {
-                    bat 'mvn sonar: sonar'
+                    bat 'mvn sonar:sonar'
                 }
             }
         }
@@ -75,6 +75,7 @@ pipeline {
                 }
             }
         }
+
     }
     post {
         always {
