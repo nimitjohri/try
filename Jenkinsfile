@@ -97,7 +97,7 @@ pipeline {
                     if (scmVars.GIT_BRANCH == "origin/dev") {
                         bat '''
                         echo %tagname%
-                        for /f %%i in ('docker ps -aqf "name=^nagp-devops-exam"') do set containerId=%%i
+                        for /f %%i in ('docker ps -aqf "name=^nagp-devops-try-dev"') do set containerId=%%i
                         echo %containerId%
                         If "%containerId%" == "" (
                             echo "No running container"
@@ -109,7 +109,7 @@ pipeline {
                     } else if  (scmVars.GIT_BRANCH == "origin/prod") {
                         bat '''
                         echo %tagname%
-                        for /f %%i in ('docker ps -aqf "name=^nagp-devops-exam-prod"') do set containerId=%%i
+                        for /f %%i in ('docker ps -aqf "name=^nagp-devops-try-prod"') do set containerId=%%i
                         echo %containerId%
                         If "%containerId%" == "" (
                             echo "No running container"
@@ -127,9 +127,9 @@ pipeline {
             steps {
                 script {
                     if (scmVars.GIT_BRANCH == "origin/dev") {
-                        bat 'docker run --name nagp-devops-exam -d -p 6310:8080 nimit07/nagp-devops-exam:%BUILD_NUMBER%'
+                        bat 'docker run --name nagp-devops-try-dev -d -p 6310:8080 nimit07/nagp-devops-try-dev:%BUILD_NUMBER%'
                     } else if  (scmVars.GIT_BRANCH == "origin/prod") {
-                        bat 'docker run --name nagp-devops-exam-prod -d -p 6410:8080 nimit07/nagp-devops-exam-prod:%BUILD_NUMBER%'
+                        bat 'docker run --name nagp-devops-try-prod -d -p 6410:8080 nimit07/nagp-devops-try-prod:%BUILD_NUMBER%'
                     }
                 }
             }
