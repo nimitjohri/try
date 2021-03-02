@@ -70,7 +70,66 @@ pipeline {
             steps {
                 script {
                     if (scmVars.GIT_BRANCH == "origin/dev") {
-                        bat 'docker build -t nimit07/nagp-devops-try-dev --no-cache -f Dockerfile .'
+                        bat 'docker build -t nimit07/nagp-devops-try-dev:%BUILD_NUMBER% --no-cache -f Dockerfile .'
+                    } else if (scmVars.GIT_BRANCH == "origin/prod") {
+                        bat 'docker build -t nimit07/nagp-devops-try-prod:%BUILD_NUMBER% --no-cache -f Dockerfile .'
+                    }
+                }
+            }
+        }
+
+        stage ('docker push') {
+            steps {
+                script {
+                    bat 'docker login -u nimit07 -p Human@123'
+                    if (scmVars.GIT_BRANCH == "origin/dev") {
+                        bat 'docker push nimit07/nagp-devops-try-dev:%BUILD_NUMBER%'
+                    } else if (scmVars.GIT_BRANCH == "origin/prod") {
+                        bat 'docker push nimit07/nagp-devops-try-prod:%BUILD_NUMBER%'
+                    }
+                }
+            }
+        }
+
+        stage ('Stop Running Contaiers') {
+            steps {
+                script {
+                    if (scmVars.GIT_BRANCH == "origin/dev") {
+                        bat '''
+                        echo %tagname%
+                        for /f %%i in ('docker ps -aqf "name=^nagp-devops-exam"') do set containerId=%%i
+                        echo %containerId%
+                        If "%containerId%" == "" (
+                            echo "No running container"
+                        ) else (
+                            docker stop %containerId%
+                            docker rm -f %containerId%
+                        )
+                        '''
+                    } else if  (scmVars.GIT_BRANCH == "origin/prod") {
+                        bat '''
+                        echo %tagname%
+                        for /f %%i in ('docker ps -aqf "name=^nagp-devops-exam-prod"') do set containerId=%%i
+                        echo %containerId%
+                        If "%containerId%" == "" (
+                            echo "No running container"
+                        ) else (
+                            docker stop %containerId%
+                            docker rm -f %containerId%
+                        )
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage ('Docker Deployment') {
+            steps {
+                script {
+                    if (scmVars.GIT_BRANCH == "origin/dev") {
+                        bat 'docker run --name nagp-devops-exam -d -p 6310:8080 nimit07/nagp-devops-exam:%BUILD_NUMBER%'
+                    } else if  (scmVars.GIT_BRANCH == "origin/prod") {
+                        bat 'docker run --name nagp-devops-exam-prod -d -p 6410:8080 nimit07/nagp-devops-exam-prod:%BUILD_NUMBER%'
                     }
                 }
             }
