@@ -8,7 +8,7 @@ pipeline {
         timestamps()
         timeout(time: 1, unit: 'HOURS')
         shikDefaultCheckout()
-        buildDiscardor(logRotator(daysToKeepStr: '10', numToKeepStr: '10'))
+        buildDiscarder(logRotator(daysToKeepStr: '10', numToKeepStr: '10'))
     }
     stages {
         stage('checkout') {
@@ -42,6 +42,30 @@ pipeline {
                 }
             }
         }
+
+        stage('artifactory') {
+            steps {
+                script {
+                    rtMavenDeployer(
+                        id: "dev",
+                        serverId: "artifactory 6.20",
+                        snapshotRepo: "nagp-devops-exam-try-1",
+                        releaseRepo: "nagp-devops-exam-try-1"
+                    )
+
+                    rtMavenRun(
+                        pom: 'pom.xml',
+                        goals: 'clean install',
+                        deployerId: 'dev'
+                    )
+
+                    rtPublishBuildInfo(
+                        serverId: "artifactory 6.20"
+                    )
+                }
+            }
+        }
+
     }
     post {
         always {
